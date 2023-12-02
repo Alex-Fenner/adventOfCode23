@@ -4,39 +4,73 @@
    let puzzle1input=""
    $: puzzle1total=puzzle1(puzzle1input)
 
+   let thresholds={"red":12,"green":13,"blue":14}
+
    function puzzle1(lines){
        let sum = 0
-       let coordList = lines.split(/\r\n|\r|\n/)
-       for (let coord of coordList) {
-           coord= coord.replace(/[^0-9]/g, '');
-           if (coord!==''){
-               sum += parseInt(coord[0]+ coord[coord.length-1])
+       let gameList = lines.split(/\r\n|\r|\n/)
+       if(!lines){
+        return 0
+       }
+       for (let game = 0;game<gameList.length;game++) {
+           if(checkGameValid(gameList[game])){
+            console.log("invalid game: "+parseInt(parseInt(game)+1))
+            sum += parseInt(game)+1
            }
+           
        }
        return sum
    }
+   function checkGameValid(game){
+    let gameData = game.split(":")[1]
+      if(gameData){
+        let hands = gameData.split(";")
+        for (let hand of hands){
+          let cubes = hand.split(",")
+          for(let cube of cubes){
+            let noOfCubes = cube.split(" ")[1]
+            let cubeColour = cube.split(" ")[2]
+            if(noOfCubes > thresholds[cubeColour]){
+              return false
+            }
+          }
+        }
+        return true
+        
+      }else{
+        return true
+      }
+           
+   }
    function puzzle2(lines){
-       let sum = 0
-       let coordList = lines.split(/\r\n|\r|\n/)
-       for (let coord of coordList) {
-           let starter=coord.substring(0,2)
-           for (let character of coord){
-               starter += character
-               starter= starter
-                   .replace('one',"o1e")
-                   .replace("two","t2o")
-                   .replace("three","t3e")
-                   .replace("four","f4r")
-                   .replace("five","f5e")
-                   .replace("six","s6x")
-                   .replace("seven","s7n")
-                   .replace("eight","e8t")
-                   .replace("nine","n9e")
-           }
-           starter= starter.replace(/[^0-9]/g, '')
-           if (coord!==''){
-               sum += parseInt(starter[0]+ starter[starter.length-1])
-           }
+    let sum = 0
+  
+       let gameList = lines.split(/\r\n|\r|\n/)
+       if(!lines){
+        return 0
+       }
+       
+       for (let game = 0;game<gameList.length;game++) {
+        let mins = {"red":0,"green":0,"blue":0}
+        let gameData = gameList[game].split(":")[1]
+        if(gameData){
+        let hands = gameData.split(";")
+        for (let hand of hands){
+          let cubes = hand.split(",")
+          for(let cube of cubes){
+            let noOfCubes = cube.split(" ")[1]
+            let cubeColour = cube.split(" ")[2]
+            console.log(noOfCubes)
+            if(parseInt(noOfCubes) > mins[cubeColour]){
+              mins[cubeColour] = parseInt(noOfCubes)
+            }
+          }
+        }
+        console.log(mins)
+        
+        
+      }
+           sum+= mins["red"] * mins["green"] * mins["blue"]
        }
        return sum
    }
